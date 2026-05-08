@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_card"
+    android:padding="16dp">
+
+    <!-- Setting Icon -->
+    <ImageView
+        android:id="@+id/icon_light"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_avatar"
+        android:contentDescription="Lights Icon"/>
+
+    <!-- Setting Name -->
+    <TextView
+        android:id="@+id/setting_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Living Room Lights"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_toRightOf="@id/icon_light"
+        android:layout_marginStart="16dp"
+        android:layout_alignTop="@id/icon_light"/>
+
+    <!-- Toggle State -->
+    <TextView
+        android:id="@+id/setting_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ON"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>
