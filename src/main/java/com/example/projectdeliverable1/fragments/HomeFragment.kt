@@ -17,8 +17,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.projectdeliverable1.R
 import com.example.projectdeliverable1.activities.DashboardActivity
 import com.example.projectdeliverable1.adapters.DeviceAdapter
+import com.example.projectdeliverable1.data.AuthRepository
 import com.example.projectdeliverable1.data.DeviceRepository
+import com.example.projectdeliverable1.data.FirestoreHelper
 import com.example.projectdeliverable1.models.Device
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -35,6 +38,7 @@ class HomeFragment : Fragment() {
     private lateinit var tvSelected: TextView
     private var selectedDevice: Device? = null
     private var sortedByName = false
+    private var firestoreListener: ListenerRegistration? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(R.layout.fragment_home, container, false)
@@ -61,7 +65,8 @@ class HomeFragment : Fragment() {
         etDescription = view.findViewById(R.id.etDeviceDescription)
         tvSelected = view.findViewById(R.id.tvSelectedDevice)
 
-        tvSubTitle.text = "$userName, manage persistent smart home devices below. Tap an item to select it."
+        val firebaseUser = AuthRepository.getCurrentUser()
+        tvSubTitle.text = "$userName, manage persistent smart home devices below. Firestore realtime sync is active after login."
 
         deviceAdapter = DeviceAdapter { selected ->
             selectedDevice = selected
@@ -77,6 +82,21 @@ class HomeFragment : Fragment() {
             loadDevices()
         }
 
+        firebaseUser?.let { user ->
+            firestoreListener = FirestoreHelper.syncUserData(
+                user.uid,
+                onUpdate = { cloudDevices ->
+                    if (cloudDevices.isNotEmpty() && etSearch.text.isNullOrBlank()) {
+                        deviceAdapter.submitList(cloudDevices)
+                        tvSubTitle.text = "Realtime Firestore sync active: ${cloudDevices.size} cloud device(s)."
+                    }
+                },
+                onError = { error ->
+                    Toast.makeText(requireContext(), "Firestore sync error: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
+
         etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -89,7 +109,8 @@ class HomeFragment : Fragment() {
             val device = readFormDevice(id = 0) ?: return@setOnClickListener
             viewLifecycleOwner.lifecycleScope.launch {
                 DeviceRepository.addDevice(requireContext(), device)
-                Toast.makeText(requireContext(), "Device saved in SQLite", Toast.LENGTH_SHORT).show()
+                AuthRepository.getCurrentUser()?.let { user -> FirestoreHelper.addDevice(user.uid, device) }
+                Toast.makeText(requireContext(), "Device saved locally and synced to Firestore", Toast.LENGTH_SHORT).show()
                 clearForm()
                 loadDevices(etSearch.text.toString())
             }
@@ -104,7 +125,14 @@ class HomeFragment : Fragment() {
             val updated = readFormDevice(id = current.id) ?: return@setOnClickListener
             viewLifecycleOwner.lifecycleScope.launch {
                 DeviceRepository.updateDevice(requireContext(), updated)
-                Toast.makeText(requireContext(), "Device updated", Toast.LENGTH_SHORT).show()
+                AuthRepository.getCurrentUser()?.let { user ->
+                    if (current.firestoreId.isNotBlank()) {
+                        FirestoreHelper.updateDevice(user.uid, current.firestoreId, updated)
+                    } else {
+                        FirestoreHelper.addDevice(user.uid, updated)
+                    }
+                }
+                Toast.makeText(requireContext(), "Device updated locally and in Firestore", Toast.LENGTH_SHORT).show()
                 clearForm()
                 loadDevices(etSearch.text.toString())
             }
@@ -118,6 +146,9 @@ class HomeFragment : Fragment() {
             }
             viewLifecycleOwner.lifecycleScope.launch {
                 DeviceRepository.deleteDevice(requireContext(), current.id)
+                AuthRepository.getCurrentUser()?.let { user ->
+                    if (current.firestoreId.isNotBlank()) FirestoreHelper.deleteDevice(user.uid, current.firestoreId)
+                }
                 Toast.makeText(requireContext(), "Device deleted", Toast.LENGTH_SHORT).show()
                 clearForm()
                 loadDevices(etSearch.text.toString())
@@ -171,6 +202,12 @@ class HomeFragment : Fragment() {
         }
         val time = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date())
         return Device(id, name, room, status, type, time, description)
+    }
+
+    override fun onDestroyView() {
+        firestoreListener?.remove()
+        firestoreListener = null
+        super.onDestroyView()
     }
 
     companion object {

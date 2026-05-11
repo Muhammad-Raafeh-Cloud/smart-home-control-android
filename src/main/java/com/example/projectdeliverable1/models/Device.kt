@@ -12,5 +12,6 @@ data class Device(
     val type: String,
     val lastUpdated: String,
     val description: String,
-    val roomId: Int = 0
+    val roomId: Int = 0,
+    val firestoreId: String = ""
 ) : Parcelable
