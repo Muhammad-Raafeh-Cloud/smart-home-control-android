@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Smart Home"
+            android:text="Smart Home Cloud"
             android:textColor="#1B2A41"
             android:textSize="28sp"
             android:textStyle="bold" />
@@ -22,14 +22,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Assignment 2 login screen"
             android:textColor="#5F6B7A"
-            android:textSize="16sp" />
+            android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="28dp"
             android:background="@drawable/bg_card"
             android:orientation="vertical"
             android:padding="20dp">
@@ -37,29 +36,62 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enter user name"
+                android:text="Firebase Login"
                 android:textColor="#1B2A41"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/etUserName"
+                android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="14dp"
                 android:background="#EEF3F8"
-                android:hint="For example: John Doe"
-                android:inputType="textPersonName"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
                 android:minHeight="48dp"
-                android:padding="14dp"
-                android:text="John Doe" />
+                android:padding="14dp" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="#EEF3F8"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:minHeight="48dp"
+                android:padding="14dp" />
 
             <Button
-                android:id="@+id/btnLogin"
+                android:id="@+id/btnEmailLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Open Dashboard" />
+                android:text="Sign In" />
+
+            <Button
+                android:id="@+id/btnEmailRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Register" />
+
+            <Button
+                android:id="@+id/btnGoogleLogin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Continue with Google" />
+
+            <TextView
+                android:id="@+id/tvAuthStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Session will persist automatically after successful Firebase login."
+                android:textColor="#5F6B7A"
+                android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

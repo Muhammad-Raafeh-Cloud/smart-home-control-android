@@ -180,7 +180,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:background="#EEF3F8"
-                android:hint="Search using SQL LIKE"
+                android:hint="Search using SQL LITE"
                 android:inputType="text"
                 android:minHeight="48dp"
                 android:padding="14dp" />
